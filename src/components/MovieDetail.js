@@ -44,7 +44,15 @@ export default function MovieDetail({
       }
       fetchMovieDetail();
     },
-    [movieId]
+    [movieId, KEY]
+  );
+
+  useEffect(
+    function () {
+      if (!Title) return;
+      document.title = `Movie: ${Title}`;
+    },
+    [Title]
   );
 
   function onAddMovie() {

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "../StarRating";
 import Loader from "./Loader";
+import { useKey } from "../hooks/useKey";
 
 export default function MovieDetail({
   movieId,
@@ -31,6 +32,12 @@ export default function MovieDetail({
     Poster,
   } = movie;
 
+  const ratingDescisionCount = useRef(0);
+
+  useEffect(() => {
+    if (userRating) ratingDescisionCount.current++;
+  }, [userRating]);
+
   useEffect(
     function () {
       async function fetchMovieDetail() {
@@ -51,13 +58,38 @@ export default function MovieDetail({
     function () {
       if (!Title) return;
       document.title = `Movie: ${Title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+      };
     },
     [Title]
   );
 
+  useKey("Escape", onClose);
+
+  // useEffect(
+  //   function () {
+  //     function callback(e) {
+  //       if (e.code === "Escape") onClose();
+  //     }
+  //     document.addEventListener("keydown", callback);
+
+  //     return function () {
+  //       document.removeEventListener("keydown", callback);
+  //     };
+  //   },
+  //   [onClose]
+  // );
+
   function onAddMovie() {
     const Runtime = movie.Runtime.split(" ").at(0);
-    const newWatchedMovie = { ...movie, userRating, Runtime };
+    const newWatchedMovie = {
+      ...movie,
+      userRating,
+      Runtime,
+      ratingDescisionCount: ratingDescisionCount.current,
+    };
     onAddMovieToList(newWatchedMovie);
     onClose();
   }
